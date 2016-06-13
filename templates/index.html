@@ -1,0 +1,49 @@
+<html>
+  <head>
+    <title>Door controll</title>
+	  <link rel="stylesheet" href="https://cdn.jsdelivr.net/picnicss/6.0.0/picnic.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+  </head>
+  <body>
+      <h1>Real Time Temperature</h1>
+      <div class="row">
+            <div class="col-md-4">
+              <h1>Temperatura: <span id='temp_value' class="label">{{ temp }}</span></h1>
+            </div>
+      </div>
+    <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
+    <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.12.0.min.js"><\/script>')</script>
+    
+    <script>
+$(document).ready(function() {
+      function UpdateTemp(temp) {
+          $('#temp_value').text(temp+' °C');
+       } 
+
+
+
+    var evento = new EventSource("/update");
+    evento.onmessage = function(e) {
+    console.log(e.data); 
+    UpdateTemp(e.data);
+
+    }
+
+
+    // Set the switch based on the value passed to this template.
+    UpdateTemp('{{ temp }}');
+});
+    </script>
+
+
+
+ 
+
+
+
+
+
+
+  </body>
+</html>
