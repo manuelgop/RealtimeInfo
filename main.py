@@ -2,6 +2,8 @@ from flask import *
 import time
 import random
 import sensor
+import json
+
 
 
 
@@ -21,11 +23,15 @@ def index():
 def updates():
     def UpdatesValues():
         while True:
-        	temp = sensor_thing.read_temp()
-        	yield 'data: {0}\n\n'.format(temp)
-        	time.sleep(1.0)
+        	#temp = sensor_thing.read_temp()
+             # Build up a dict of the current thing state.
+            temp_state = {
+                'temperature': sensor_thing.read_temp()
+            }
+            yield('data: {0}\n\n'.format(json.dumps(temp_state)))
+            time.sleep(1.0)
     return Response(UpdatesValues(), mimetype='text/event-stream')
 
 if __name__ == "__main__":
-	app.run(host='0.0.0.0', port=50, debug=True, threaded=False)
+	app.run(host='0.0.0.0', port=50, debug=True, threaded=True)
 

@@ -9,24 +9,70 @@
       <h1>Real Time Temperature</h1>
       <div class="row">
             <div class="col-md-4">
-              <h1>Temperatura: <span id='temp_value' class="label">{{ temp }}</span></h1>
+              <h1>Temperatura: <span id='temp_value' class="label"></span></h1>
+              <h2>Temp Sensor Graph</h2>
+              <canvas id='temp_chart' width='400' height='400'></canvas>
             </div>
+
+
+           
+
       </div>
     <script src="https://code.jquery.com/jquery-1.12.0.min.js"></script>
     <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.12.0.min.js"><\/script>')</script>
-    
+    <script src="{{ url_for('static', filename='js/Chart.min.js') }}"></script>
+
     <script>
 $(document).ready(function() {
-      function UpdateTemp(temp) {
-          $('#temp_value').text(temp+' °C');
+
+     
+
+
+ // Setup temperature & humidity chart.
+var ctx = $('#temp_chart').get(0).getContext('2d');
+var tempChart = new Chart(ctx).Line({
+              labels: [],
+              datasets: [
+                {
+                  label: "Temperature (Celsius)",
+                  fillColor: "rgba(220,220,220,0.2)",
+                  strokeColor: "rgba(220,220,220,1)",
+                  pointColor: "rgba(220,220,220,1)",
+                  pointStrokeColor: "#fff",
+                  pointHighlightFill: "#fff",
+                  pointHighlightStroke: "rgba(220,220,220,1)",
+                  data: []
+                },
+                {
+                  label: "Humidity (%)",
+                  fillColor: "rgba(151,187,205,0.2)",
+                  strokeColor: "rgba(151,187,205,1)",
+                  pointColor: "rgba(151,187,205,1)",
+                  pointStrokeColor: "#fff",
+                  pointHighlightFill: "#fff",
+                  pointHighlightStroke: "rgba(151,187,205,1)",
+                  data: []
+                }
+              ]
+            });
+
+ function UpdateTemp(temp) {
+          $('#temp_value').text(temp.temperature + ' °C');
+          //Agrega valores a la grafica
+          tempChart.addData([temp.temperature],
+                new Date().toLocaleTimeString());
+              // Bump off the oldest chart measurement after 20 of them are taken.
+              if (tempChart.datasets[0].points.length > 20) {
+                tempChart.removeData();
+              }
+          
        } 
-
-
+  
 
     var evento = new EventSource("/update");
     evento.onmessage = function(e) {
     console.log(e.data); 
-    UpdateTemp(e.data);
+    UpdateTemp($.parseJSON(e.data));
 
     }
 
